@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Hello World</title>
+  <style>
+      *{margin: 0;
+        padding 0;}
+</style>
+</head>
+  <script src="pixi.min.js"></script>
+<body>
+  <script type="text/javascript">
+
+   if(!PIXI.utils.isWebGLSupported()){
+      type = "canvas"
+    }
+      let app = new PIXI.Application({width: 500, height: 500});
+
+
+    //Add the canvas that Pixi automatically created for you to the HTML document
+
+
+        var factorialize = function(num){
+              var result = num;
+              if (num === 0 || num === 1) 
+                return 1; 
+              while (num > 1) { 
+                num--;
+                result *= num;
+              }
+              return result;}
+
+        var cnk = function(n,i){
+                return (factorialize(n) / (factorialize(i)*factorialize(n-i)));
+            }
+
+        function getCoefficients(n){
+            var arrayOfCoefficients = [];
+            for(var j=0; j<=n; j++){
+                  arrayOfCoefficients.push([cnk(n,j),n-j,j]);
+              }
+            return arrayOfCoefficients;
+        }
+
+        function getCurve(arr){
+            var ar=[];
+            var sum = 0;
+            var coeff = getCoefficients(arr.length-1);
+            for(var i=0;i<=100;i++){
+                for(var j=0; j<arr.length; j++){
+                    sum+=coeff[j][0]*Math.pow(1-(i/100),coeff[j][1])*Math.pow((i/100),coeff[j][2])*arr[j];
+                }
+                ar.push(sum);
+                sum = 0;
+            }    
+            return ar;
+        }
+
+
+      
+    var arrX = []; 
+    var arrY = [];
+    document.addEventListener("click", printMousePos);  
+    function printMousePos(event) {
+        console.log(event)
+        if (event.target.tagName==='CANVAS'){
+        arrX.push(event.clientX);
+        arrY.push(event.clientY);
+        let circle = new PIXI.Graphics();
+        circle.beginFill(0xff669b);
+        circle.drawCircle(0, 0, 4);
+        circle.endFill();
+        circle.x = event.clientX;
+        circle.y = event.clientY;
+        app.stage.addChild(circle);
+
+        }
+                    
+            if(event.target.tagName==='BUTTON' && arrX.length>=2){
+            var curveX = getCurve(arrX);
+            var curveY = getCurve(arrY);
+                for(var i = 0; i < curveX.length; i++){
+                let circle2 = new PIXI.Graphics();
+                circle2.beginFill(0x000000);
+                circle2.drawCircle(0, 0, 2);
+                circle2.endFill();
+                circle2.x = curveX[i];
+                circle2.y = curveY[i];
+                app.stage.addChild(circle2);
+        }     
+    }
+
+    }
+    
+
+      
+        app.renderer.backgroundColor = 0xc1c1c1; 
+        document.body.appendChild(app.view);
+
+
+  </script>
+  <div>
+      Make some points on the canvas and press "Display Curve";
+      To restart reload the page.
+  </div>
+  <div>
+  <button class="display">Display Curve</button>
+  </div>
+
+</body>
+</html>
